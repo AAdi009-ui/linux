@@ -4,9 +4,9 @@
 #include <time.h>
 #include <unistd.h>
 
-//
+// NOTE:
 // this needs to be compiled, before compile the program, change the server names
-// on *servers[] compile with: gcc -o pacemon pacemon.c -lpthread pacemon
+// on *servers[] compile with: "gcc -o pacemon pacemon.c -lpthread"
 // usually should be executed on node1; needs ssh access without password
 //
 
@@ -25,8 +25,8 @@
 // use the install.sh script to install this as a service to see the log use:
 // journalctl -f -u pacemon
 //
-// you can also redirect the output of this service to a file and tail -f
-// file.txt pacemon can also run as an executable without the service
+// you can also redirect the output of this service to a file and "tail -f
+// file.txt" pacemon can also run as an executable without the service
 //
 // program creates an ssh connection to the servers, so you can also run this
 // program from another server, as long as you set their names on /etc/hosts
