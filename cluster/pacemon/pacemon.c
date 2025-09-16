@@ -1,12 +1,13 @@
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
 
-// NOTE:
-// this needs to be compiled, before compile the program, change the server names
-// on *servers[] compile with: "gcc -o pacemon pacemon.c -lpthread"
+//
+// this needs to be compiled, before compile the program, change the server
+// names on *servers[] compile with: gcc -o pacemon pacemon.c -lpthread pacemon
 // usually should be executed on node1; needs ssh access without password
 //
 
@@ -25,8 +26,8 @@
 // use the install.sh script to install this as a service to see the log use:
 // journalctl -f -u pacemon
 //
-// you can also redirect the output of this service to a file and "tail -f
-// file.txt" pacemon can also run as an executable without the service
+// you can also redirect the output of this service to a file and tail -f
+// file.txt pacemon can also run as an executable without the service
 //
 // program creates an ssh connection to the servers, so you can also run this
 // program from another server, as long as you set their names on /etc/hosts
@@ -35,29 +36,42 @@
 // Example of pacemon execution, watch the operation probe, monitor, start, stop
 // and even for virtual IP:
 //
-// ./pacemon
-// Sep 14 20:21:01 - PID: 1065 - lapps-n2 - probe        - kafdrop-ip       - lapps-n2 - not running 
-// Sep 14 21:22:05 - PID: 1252 - lapps-n1 - monitor      - kafdrop          - lapps-n1 - Cancelled 
-// Sep 14 21:22:07 - PID: 1252 - lapps-n1 - stop         - kafdrop          - lapps-n1 - ok 
-// Sep 14 21:22:07 - PID: 1252 - lapps-n1 - monitor      - kafdrop-ip       - lapps-n1 - Cancelled 
-// Sep 14 21:22:07 - PID: 1252 - lapps-n1 - stop         - kafdrop-ip       - lapps-n1 - ok 
-// Sep 14 21:22:06 - PID: 1084 - lapps-n3 - start        - kafdrop-ip       - lapps-n3 - ok 
-// Sep 14 21:22:07 - PID: 1084 - lapps-n3 - monitor      - kafdrop-ip       - lapps-n3 - ok 
-// Sep 14 21:22:09 - PID: 1084 - lapps-n3 - start        - kafdrop          - lapps-n3 - ok 
-// Sep 14 21:22:09 - PID: 1084 - lapps-n3 - monitor      - kafdrop          - lapps-n3 - ok 
-// Sep 14 21:22:11 - 192.168.248.45 for virtual IP kafdrop-ip on device ens160
-// 
+// ./pacemon 
+// Pacemaker cluster nodes found:
+//   lapps-n1
+//   lapps-n2
+//   lapps-n3
+//   lapps-n4
+// Total cluster nodes: 4
+// Sep 15 20:15:18 - PID: 1085 - lapps-n4 - monitor      - kafdrop-ip       - lapps-n4 - ok 
+// Sep 15 20:15:20 - PID: 1085 - lapps-n4 - start        - kafdrop          - lapps-n4 - ok 
+// Sep 15 20:15:20 - PID: 1085 - lapps-n4 - monitor      - kafdrop          - lapps-n4 - ok 
+// Sep 15 20:15:22 - 192.168.248.45 for virtual IP kafdrop-ip on device ens160
+// Sep 15 20:23:27 - PID: 1085 - lapps-n4 - monitor      - kafdrop          - lapps-n4 - Cancelled 
+// Sep 15 20:23:29 - PID: 1085 - lapps-n4 - stop         - kafdrop          - lapps-n4 - ok 
+// Sep 15 20:23:29 - PID: 1085 - lapps-n4 - monitor      - kafdrop-ip       - lapps-n4 - Cancelled 
+// Sep 15 20:23:29 - PID: 1085 - lapps-n4 - stop         - kafdrop-ip       - lapps-n4 - ok 
+// Sep 15 20:15:18 - PID: 1033 - lapps-n2 - stop         - kafdrop-ip       - lapps-n2 - ok 
+// Sep 15 20:23:30 - PID: 1032 - lapps-n3 - start        - kafdrop-ip       - lapps-n3 - ok 
+// Sep 15 20:23:30 - PID: 1032 - lapps-n3 - monitor      - kafdrop-ip       - lapps-n3 - ok 
+// Sep 15 20:23:32 - PID: 1032 - lapps-n3 - start        - kafdrop          - lapps-n3 - ok 
+// Sep 15 20:23:32 - PID: 1032 - lapps-n3 - monitor      - kafdrop          - lapps-n3 - ok 
+// Sep 15 20:23:34 - 192.168.248.45 for virtual IP kafdrop-ip on device ens160
+//
 
 #define MAX_PATH_LEN 1024
+
+#define MAX_NODES 16
+#define MAX_NAME_LEN 128
 
 typedef struct {
   char server[128];
   char log_file_path[MAX_PATH_LEN];
 } MonitorArgs;
 
-// Replace with your node hostnames
-const char *servers[] = {"lapps-n1", "lapps-n2", "lapps-n3", "lapps-n4"};
-int num_servers = sizeof(servers) / sizeof(servers[0]);
+// // Replace with your node hostnames
+// const char *servers[] = {"lapps-n1", "lapps-n2", "lapps-n3", "lapps-n4"};
+// int num_servers = sizeof(servers) / sizeof(servers[0]);
 
 // this is the default, you can pass as parameter another log
 const char *log_file_path = "/var/log/pacemaker/pacemaker.log";
@@ -211,9 +225,64 @@ void *tail_remote_log(void *arg) {
   return NULL; // well... let's hope to return nothing never
 }
 
+// Fills `servers_ptr` with malloc'd strings for node names. Returns server
+// count. Also prints them out.
+int getClusterNames(char servers[MAX_NODES][MAX_NAME_LEN]) {
+  FILE *fp = popen("crm_node -l", "r");
+  if (!fp) {
+    perror("ERROR executing crm_node command failed");
+    return 0;
+  }
+
+  char line[256];
+  int count = 0;
+
+  printf("Pacemaker cluster nodes found:\n");
+
+  while (count < MAX_NODES && fgets(line, sizeof(line), fp)) {
+    // Format is: "<id> <name> [optional info]"
+    char *space = strchr(line, ' ');
+    if (!space)
+      continue;
+
+    char *name_start = space + 1;
+    char *name_end = strchr(name_start, ' ');
+    if (!name_end) {
+      name_end = name_start + strlen(name_start);
+    }
+
+    int name_len = (int)(name_end - name_start);
+    while (name_len > 0 && (name_start[name_len - 1] == '\n' ||
+                            name_start[name_len - 1] == ' '))
+      name_len--;
+    if (name_len <= 0)
+      continue;
+
+    if (name_len >= MAX_NAME_LEN)
+      name_len = MAX_NAME_LEN - 1;
+
+    strncpy(servers[count], name_start, name_len);
+    servers[count][name_len] = '\0';
+    printf("  %s\n", servers[count]);
+    count++;
+  }
+
+  pclose(fp);
+  printf("Total cluster nodes: %d\n", count);
+
+  return count;
+}
+
 int main(int argc, char *argv[]) {
   pthread_t threads[16];
   MonitorArgs args[16];
+
+  char servers[MAX_NODES][MAX_NAME_LEN];
+  int num_servers = getClusterNames(servers);
+  if (num_servers == 0) {
+    fprintf(stderr, "No cluster nodes found or error reading.\n");
+    return 1;
+  }
 
   for (int i = 0; i < num_servers; ++i) {
     strncpy(args[i].server, servers[i], sizeof(args[i].server) - 1);
